@@ -1,0 +1,19 @@
+{
+  "name": "testa-monorepo",
+  "private": true,
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter @testa/api dev\" \"pnpm --filter @testa/web dev\"",
+    "build": "pnpm --filter @testa/shared build && pnpm --filter @testa/api build && pnpm --filter @testa/web build",
+    "lint": "pnpm -r lint",
+    "migrate": "pnpm --filter @testa/api migrate:dev",
+    "db:push": "pnpm --filter @testa/api db:push"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

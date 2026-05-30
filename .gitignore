@@ -1,0 +1,28 @@
+# Dependencies
+node_modules
+
+# Environment — never commit secrets
+.env
+.env.local
+.env.*.local
+apps/api/.env
+
+# SQLite database
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Build output
+dist
+.next
+*.tsbuildinfo
+
+# Playwright artifacts
+test-results
+playwright-report
+uploads
+
+# Misc
+.DS_Store
+.claude

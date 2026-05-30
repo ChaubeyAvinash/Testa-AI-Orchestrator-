@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Project {
+  id         String      @id @default(cuid())
+  name       String
+  url        String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  executions Execution[]
+}
+
+model Execution {
+  id            String          @id @default(cuid())
+  projectId     String
+  project       Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  status        ExecutionStatus @default(PENDING)
+  testTypes     String          @default("[]")
+  generatedCode String?
+  crawlResult   String?
+  totalTests    Int             @default(0)
+  passedTests   Int             @default(0)
+  failedTests   Int             @default(0)
+  startedAt     DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime        @default(now())
+  testResults   TestResult[]
+}
+
+enum ExecutionStatus {
+  PENDING
+  CRAWLING
+  GENERATING
+  RUNNING
+  ANALYZING
+  COMPLETED
+  FAILED
+}
+
+model TestResult {
+  id               String     @id @default(cuid())
+  executionId      String
+  execution        Execution  @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  testName         String
+  status           TestStatus
+  duration         Int
+  errorMessage     String?
+  stackTrace       String?
+  screenshotBase64 String?
+  aiSuggestion     String?
+  createdAt        DateTime   @default(now())
+}
+
+enum TestStatus {
+  PASSED
+  FAILED
+  SKIPPED
+  TIMEDOUT
+}

@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+/* ── Accenture design system ─────────────────────────────────────────── */
+:root {
+  --ac-purple:       #a100ff;
+  --ac-purple-dark:  #7500c0;
+  --ac-purple-dim:   rgba(161, 0, 255, 0.12);
+  --ac-black:        #000000;
+  --ac-surface:      #0d0d0d;
+  --ac-card:         #111111;
+  --ac-border:       #1e1e1e;
+  --ac-border-light: #2a2a2a;
+  --ac-text:         #ffffff;
+  --ac-text-muted:   #737373;
+  --ac-success:      #00cc66;
+  --ac-danger:       #ff3333;
+  --ac-warning:      #ffaa00;
+
+  --background: var(--ac-black);
+  --foreground: var(--ac-text);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background: var(--ac-black);
+  color: var(--ac-text);
+  font-family: var(--font-geist-sans), 'Inter', Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Accenture-style scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--ac-surface); }
+::-webkit-scrollbar-thumb { background: var(--ac-purple-dark); }
+
+/* Sharp focus ring */
+:focus-visible {
+  outline: 1px solid var(--ac-purple);
+  outline-offset: 2px;
+}
