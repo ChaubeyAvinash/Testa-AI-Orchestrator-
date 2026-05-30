@@ -17,21 +17,13 @@ if %ERRORLEVEL% neq 0 (
 for /f "tokens=*" %%i in ('node -e "process.stdout.write(process.version)"') do set NODE_VER=%%i
 echo   OK  Node.js %NODE_VER%
 
-where pnpm >nul 2>&1
+where npm >nul 2>&1
 if %ERRORLEVEL% neq 0 (
-    echo [TESTA] pnpm not found -- installing pnpm@latest...
-    call npm install -g pnpm@latest
+    echo   x  npm not found. It ships with Node.js -- reinstall from https://nodejs.org
+    pause & exit /b 1
 )
-
-:: Lockfile uses format v9.0 -- requires pnpm v9+
-for /f "tokens=*" %%i in ('pnpm --version') do set PNPM_VER=%%i
-for /f "tokens=1 delims=." %%i in ("%PNPM_VER%") do set PNPM_MAJOR=%%i
-if %PNPM_MAJOR% LSS 9 (
-    echo [TESTA] pnpm %PNPM_VER% is too old ^(need v9+^) -- upgrading...
-    call npm install -g pnpm@latest
-    for /f "tokens=*" %%i in ('pnpm --version') do set PNPM_VER=%%i
-)
-echo   OK  pnpm %PNPM_VER%
+for /f "tokens=*" %%i in ('npm --version') do set NPM_VER=%%i
+echo   OK  npm %NPM_VER%
 
 :: ── 2. Check .env ─────────────────────────────────────────────────────────────
 echo [TESTA] Checking environment...
@@ -51,14 +43,14 @@ echo   OK  .env file present
 :: ── 3. Install dependencies ───────────────────────────────────────────────────
 if not exist "node_modules" (
     echo [TESTA] Installing dependencies...
-    call pnpm install
+    call npm install
 ) else (
     echo   OK  Dependencies already installed
 )
 
 :: ── 4. Build shared package ───────────────────────────────────────────────────
 echo [TESTA] Building shared types...
-call pnpm --filter @testa/shared build --silent
+call npm run build --workspace=packages/shared
 echo   OK  Shared package built
 
 :: ── 5. Run database migration ─────────────────────────────────────────────────
@@ -76,10 +68,10 @@ echo     API      -- http://localhost:3001/api/v1
 echo     Frontend -- http://localhost:3000
 echo.
 
-call pnpm exec concurrently ^
+call npx concurrently ^
   --names "API,WEB" ^
   --prefix-colors "magenta,cyan" ^
   --kill-others ^
   --kill-others-on-fail ^
-  "cd apps/api && pnpm run start:dev" ^
-  "cd apps/web && pnpm run dev"
+  "cd apps/api && npm run start:dev" ^
+  "cd apps/web && npm run dev"

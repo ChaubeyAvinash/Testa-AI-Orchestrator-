@@ -3,15 +3,18 @@
   "private": true,
   "version": "0.0.1",
   "engines": {
-    "node": ">=20",
-    "pnpm": ">=9"
+    "node": ">=20"
   },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "concurrently \"pnpm --filter @testa/api dev\" \"pnpm --filter @testa/web dev\"",
-    "build": "pnpm --filter @testa/shared build && pnpm --filter @testa/api build && pnpm --filter @testa/web build",
-    "lint": "pnpm -r lint",
-    "migrate": "pnpm --filter @testa/api migrate:dev",
-    "db:push": "pnpm --filter @testa/api db:push"
+    "dev": "concurrently \"npm run start:dev --workspace=apps/api\" \"npm run dev --workspace=apps/web\"",
+    "build": "npm run build --workspace=packages/shared && npm run build --workspace=apps/api && npm run build --workspace=apps/web",
+    "lint": "npm run lint --workspaces --if-present",
+    "migrate": "cd apps/api && DATABASE_URL=file:./dev.db npx prisma migrate deploy",
+    "db:push": "cd apps/api && DATABASE_URL=file:./dev.db npx prisma db push"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

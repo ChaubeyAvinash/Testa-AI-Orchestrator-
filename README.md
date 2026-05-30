@@ -21,7 +21,7 @@ TESTA crawls your website, writes Playwright tests using GPT-5.1, executes them,
 [![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright&logoColor=white)](https://playwright.dev/)
 [![Azure AI](https://img.shields.io/badge/Azure_AI_Foundry-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)](https://ai.azure.com/)
 [![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://sqlite.org/)
-[![pnpm](https://img.shields.io/badge/pnpm-F69220?style=for-the-badge&logo=pnpm&logoColor=white)](https://pnpm.io/)
+[![npm](https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white)](https://npmjs.com/)
 
 <br/>
 
@@ -86,7 +86,7 @@ Choose one or more when starting a run:
 | **AI Model** | Azure AI Foundry · GPT-5.1 via `@azure-rest/ai-inference` |
 | **Browser Engine** | Playwright 1.60 — used for both crawling and test execution |
 | **Real-time** | Server-Sent Events · NestJS `@Sse()` · RxJS Subjects |
-| **Monorepo** | pnpm workspaces (`apps/api`, `apps/web`, `packages/shared`) |
+| **Monorepo** | npm workspaces (`apps/api`, `apps/web`, `packages/shared`) |
 | **Launch** | `start.sh` (Linux/macOS/Git Bash) · `start.bat` (Windows CMD) |
 
 ---
@@ -143,9 +143,8 @@ Testa-AI-Orchestrator/
 
 ### Prerequisites
 
-- **Node.js** ≥ 20 — [nodejs.org](https://nodejs.org)
+- **Node.js** ≥ 20 (includes npm) — [nodejs.org](https://nodejs.org)
 - **Azure AI Foundry** account with **GPT-5.1** deployed — [ai.azure.com](https://ai.azure.com)
-- pnpm is installed automatically if missing
 
 ### 1. Clone the repository
 
@@ -188,13 +187,12 @@ start.bat
 Both scripts are fully automatic — no manual steps:
 
 ```
-  ① Check Node.js is installed
-  ② Install pnpm if missing
-  ③ Detect missing .env → copy from template + prompt to fill in credentials
-  ④ pnpm install  (skipped if node_modules already exists)
-  ⑤ Build packages/shared (TypeScript types)
-  ⑥ prisma migrate deploy  (creates apps/api/dev.db)
-  ⑦ Start API + Frontend concurrently with colour-coded logs
+  ① Check Node.js and npm are installed
+  ② Detect missing .env → copy from template + prompt to fill in credentials
+  ③ npm install  (skipped if node_modules already exists)
+  ④ Build packages/shared (TypeScript types)
+  ⑤ prisma migrate deploy  (creates apps/api/dev.db)
+  ⑥ Start API + Frontend concurrently with colour-coded logs
 ```
 
 ### 4. Open the app
@@ -374,14 +372,17 @@ Project
 **Individual dev commands:**
 
 ```bash
+# Install all dependencies (root + all workspaces)
+npm install
+
 # API only (hot reload)
-pnpm --filter api start:dev
+npm run start:dev --workspace=apps/api
 
 # Frontend only
-pnpm --filter @testa/web dev
+npm run dev --workspace=apps/web
 
 # Rebuild shared types
-pnpm --filter @testa/shared build
+npm run build --workspace=packages/shared
 
 # Prisma migration (create new)
 cd apps/api && DATABASE_URL=file:./dev.db npx prisma migrate dev --name <name>
@@ -412,9 +413,9 @@ cd apps/api && DATABASE_URL=file:./dev.db npx prisma studio
 - Kill the existing process: `lsof -ti:3001 | xargs kill` (Linux/macOS) or use Task Manager (Windows)
 - Or set a custom port via `PORT=3002` in `apps/api/.env`
 
-**`pnpm: command not found`**
-- The launcher scripts auto-install pnpm via `npm install -g pnpm`
-- If that fails, install manually: `npm install -g pnpm@latest`
+**`@testa/shared` not found after cloning**
+- Run `npm run build --workspace=packages/shared` before starting the API or frontend
+- The launcher scripts do this automatically
 
 ---
 
@@ -435,7 +436,7 @@ cd apps/api && DATABASE_URL=file:./dev.db npx prisma studio
 
 1. Fork the repo and create a feature branch
 2. Run `bash start.sh` to confirm the baseline works
-3. Make your changes — the monorepo is hot-reload enabled for both API and frontend
+3. Make your changes — both API and frontend support hot reload
 4. Run `make lint` before opening a PR
 5. Open a pull request against `main`
 

@@ -6,13 +6,13 @@ start:
 
 # Install all workspace dependencies
 install:
-	pnpm install
+	npm install
 
 # Build shared package + both apps
 build:
-	pnpm --filter @testa/shared build
-	pnpm --filter api build
-	pnpm --filter @testa/web build
+	npm run build --workspace=packages/shared
+	npm run build --workspace=apps/api
+	npm run build --workspace=apps/web
 
 # Apply SQLite migrations
 migrate:
@@ -24,7 +24,7 @@ generate:
 
 # Run linters across the monorepo
 lint:
-	pnpm -r lint
+	npm run lint --workspaces --if-present
 
 # Remove build artifacts
 clean:

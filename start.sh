@@ -29,20 +29,9 @@ command -v node >/dev/null 2>&1 || fail "Node.js not found. Install from https:/
 NODE_VER=$(node -e "process.stdout.write(process.version)")
 ok "Node.js $NODE_VER"
 
-if ! command -v pnpm >/dev/null 2>&1; then
-  step "pnpm not found — installing pnpm@latest..."
-  npm install -g pnpm@latest
-fi
-
-# Lockfile uses format v9.0 — requires pnpm v9+
-PNPM_VER=$(pnpm --version)
-PNPM_MAJOR=$(echo "$PNPM_VER" | cut -d. -f1)
-if [ "$PNPM_MAJOR" -lt 9 ]; then
-  step "pnpm $PNPM_VER is too old (need v9+) — upgrading..."
-  npm install -g pnpm@latest
-  PNPM_VER=$(pnpm --version)
-fi
-ok "pnpm $PNPM_VER"
+command -v npm >/dev/null 2>&1 || fail "npm not found. It ships with Node.js — reinstall Node.js from https://nodejs.org"
+NPM_VER=$(npm --version)
+ok "npm $NPM_VER"
 
 # ── 2. Check .env ──────────────────────────────────────────────────────────────
 step "Checking environment..."
@@ -64,14 +53,14 @@ ok ".env file present"
 # ── 3. Install dependencies ────────────────────────────────────────────────────
 if [ ! -d "node_modules" ]; then
   step "Installing dependencies..."
-  pnpm install
+  npm install
 else
   ok "Dependencies already installed"
 fi
 
 # ── 4. Build shared package ────────────────────────────────────────────────────
 step "Building shared types..."
-pnpm --filter @testa/shared build --silent
+npm run build --workspace=packages/shared
 ok "Shared package built"
 
 # ── 5. Run database migration ──────────────────────────────────────────────────
@@ -88,11 +77,10 @@ echo -e "  ${CYAN}API${RESET}      → http://localhost:3001/api/v1"
 echo -e "  ${CYAN}Frontend${RESET} → http://localhost:3000"
 echo ""
 
-# Run API and frontend concurrently using pnpm's concurrently (already a root devDep)
-pnpm exec concurrently \
+npx concurrently \
   --names "API,WEB" \
   --prefix-colors "magenta,cyan" \
   --kill-others \
   --kill-others-on-fail \
-  "cd apps/api && pnpm run start:dev" \
-  "cd apps/web && pnpm run dev"
+  "cd apps/api && npm run start:dev" \
+  "cd apps/web && npm run dev"

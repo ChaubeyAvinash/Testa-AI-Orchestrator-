@@ -8,7 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@testa/shared": "workspace:*",
+    "@testa/shared": "*",
     "clsx": "^2.1.1",
     "lucide-react": "^1.17.0",
     "next": "16.2.6",
