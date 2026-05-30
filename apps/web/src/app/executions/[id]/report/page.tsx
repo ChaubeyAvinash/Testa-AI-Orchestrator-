@@ -6,6 +6,13 @@ import type { ExecutionDto, TestResultDto } from '@testa/shared';
 import { TestStatus } from '@testa/shared';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
+// '<svg' base64-encodes to 'PHN2' — use svg+xml MIME type for SVG placeholders
+function screenshotSrc(base64: string): string {
+  return base64.startsWith('PHN2')
+    ? `data:image/svg+xml;base64,${base64}`
+    : `data:image/png;base64,${base64}`;
+}
+
 const COLORS = {
   pass: '#00cc66',
   fail: '#ff3333',
@@ -70,6 +77,24 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
               Completed in {durationSec}s &nbsp;&bull;&nbsp; {(execution as any).testTypes?.join(', ') ?? ''}
             </p>
           )}
+          <div className="ml-4 mt-2">
+            {execution.isMock === true && (
+              <span
+                className="text-xs font-bold tracking-widest px-2.5 py-1 bg-[#ffaa0018] text-[#ffaa00]"
+                title="Azure AI was unavailable — results are illustrative sample data"
+              >
+                SAMPLE DATA
+              </span>
+            )}
+            {execution.isMock === false && (
+              <span
+                className="text-xs font-bold tracking-widest px-2.5 py-1 bg-[#a100ff18] text-[#a100ff]"
+                title="Generated and executed by Azure AI"
+              >
+                REAL AI
+              </span>
+            )}
+          </div>
         </div>
         <a
           href="/projects/new"
@@ -213,7 +238,7 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
                         className="block hover:opacity-80 transition-opacity"
                       >
                         <img
-                          src={`data:image/png;base64,${result.screenshotBase64}`}
+                          src={screenshotSrc(result.screenshotBase64!)}
                           alt="Failure screenshot"
                           className="max-h-48 border border-[#1e1e1e]"
                         />
@@ -248,7 +273,7 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
               {'>'} CLOSE
             </button>
             <img
-              src={`data:image/png;base64,${screenshot}`}
+              src={screenshotSrc(screenshot)}
               alt="Screenshot"
               className="max-w-full max-h-screen border border-[#1e1e1e]"
             />

@@ -429,12 +429,40 @@ const RESULTS_BY_TYPE: Record<string, TestRunResult[]> = {
   api: API_RESULTS,
 };
 
+function getMockScreenshot(errorMessage = ''): string {
+  const esc = (s: string) =>
+    s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const line1 = esc(errorMessage.slice(0, 90));
+  const line2 = esc(errorMessage.slice(90, 180));
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="320" viewBox="0 0 800 320">
+  <rect width="800" height="320" fill="#0a0a0a"/>
+  <rect width="800" height="40" fill="#111111"/>
+  <circle cx="22" cy="20" r="7" fill="#ff5f57"/>
+  <circle cx="44" cy="20" r="7" fill="#febc2e"/>
+  <circle cx="66" cy="20" r="7" fill="#28c840"/>
+  <rect x="86" y="12" width="596" height="18" rx="4" fill="#1a1a1a"/>
+  <text x="384" y="24" font-family="Courier New,monospace" font-size="10" fill="#3a3a3a" text-anchor="middle">about:blank — playwright runner</text>
+  <line x1="0" y1="40" x2="800" y2="40" stroke="#1e1e1e" stroke-width="1"/>
+  <text x="400" y="125" font-family="Courier New,monospace" font-size="13" fill="#ff3333" text-anchor="middle" font-weight="bold">&#x2715;  TEST ASSERTION FAILED</text>
+  <line x1="30" y1="140" x2="770" y2="140" stroke="#1e1e1e" stroke-width="1"/>
+  <text x="50" y="175" font-family="Courier New,monospace" font-size="11" fill="#737373">${line1}</text>
+  ${line2 ? `<text x="50" y="198" font-family="Courier New,monospace" font-size="11" fill="#737373">${line2}</text>` : ''}
+  <line x1="0" y1="295" x2="800" y2="295" stroke="#1e1e1e" stroke-width="1"/>
+  <text x="400" y="310" font-family="Courier New,monospace" font-size="9" fill="#2a2a2a" text-anchor="middle">Screenshot captured at failure moment — TESTA runner</text>
+</svg>`;
+  return Buffer.from(svg).toString('base64');
+}
+
 export function getMockResults(testTypes: string[]): TestRunResult[] {
   const out: TestRunResult[] = [];
   for (const t of testTypes) {
     out.push(...(RESULTS_BY_TYPE[t] ?? []));
   }
-  return out;
+  return out.map((r) =>
+    r.status !== TestStatus.PASSED && !r.screenshotBase64
+      ? { ...r, screenshotBase64: getMockScreenshot(r.errorMessage ?? '') }
+      : r,
+  );
 }
 
 // ── Per-failure AI suggestions ────────────────────────────────────────────────

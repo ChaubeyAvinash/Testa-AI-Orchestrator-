@@ -35,6 +35,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {/* Nav actions */}
             <nav className="flex items-center gap-6">
               <a
+                href="/projects"
+                className="text-xs tracking-widest uppercase text-[#737373] hover:text-[#a100ff] transition-colors"
+              >
+                History
+              </a>
+              <a
                 href="/projects/new"
                 className="text-xs tracking-widest uppercase text-[#737373] hover:text-[#a100ff] transition-colors"
               >

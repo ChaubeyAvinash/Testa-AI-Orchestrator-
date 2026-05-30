@@ -98,20 +98,32 @@ export class TestRunnerService {
       const report = JSON.parse(raw);
       const results = this.parseReport(report);
 
-      // Attach screenshot base64 from test-results directory
+      // Collect all failure screenshots from test-results subdirectories.
+      // Playwright saves them as: test-results/<suite>-<test>-<hash>/test-failed-1.png
       const testResultsDir = path.join(tmpDir, 'test-results');
-      for (const result of results) {
-        if (result.status === TestStatus.FAILED) {
+      const screenshotPool: string[] = [];
+      try {
+        const entries = await fs.readdir(testResultsDir).catch(() => [] as string[]);
+        for (const entry of entries) {
+          const entryPath = path.join(testResultsDir, entry);
           try {
-            const files = await fs.readdir(testResultsDir).catch(() => []);
-            const screenshot = files.find((f) => f.endsWith('.png'));
-            if (screenshot) {
-              const buf = await fs.readFile(path.join(testResultsDir, screenshot));
-              result.screenshotBase64 = buf.toString('base64');
+            const stat = await fs.stat(entryPath);
+            if (!stat.isDirectory()) continue;
+            const files = await fs.readdir(entryPath).catch(() => [] as string[]);
+            const png = files.find((f) => f.endsWith('.png'));
+            if (png) {
+              const buf = await fs.readFile(path.join(entryPath, png));
+              screenshotPool.push(buf.toString('base64'));
             }
-          } catch {
-            // no screenshot
-          }
+          } catch { /* skip unreadable entries */ }
+        }
+      } catch { /* test-results dir may not exist */ }
+
+      let screenshotIdx = 0;
+      for (const result of results) {
+        if (result.status === TestStatus.FAILED && screenshotPool.length > 0) {
+          result.screenshotBase64 = screenshotPool[screenshotIdx % screenshotPool.length];
+          screenshotIdx++;
         }
         onTestComplete?.(result);
       }

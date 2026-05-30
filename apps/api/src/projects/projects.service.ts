@@ -11,10 +11,11 @@ export class ProjectsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll() {
-    return this.prisma.project.findMany({
+    const rows = await this.prisma.project.findMany({
       orderBy: { createdAt: 'desc' },
       include: { _count: { select: { executions: true } } },
     });
+    return rows.map(({ _count, ...p }) => ({ ...p, executionCount: _count.executions }));
   }
 
   async findOne(id: string) {

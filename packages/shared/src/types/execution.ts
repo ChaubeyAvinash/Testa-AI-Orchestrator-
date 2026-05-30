@@ -18,6 +18,7 @@ export interface ExecutionDto {
   projectId: string;
   status: ExecutionStatus;
   testTypes: string[];
+  isMock?: boolean;
   totalTests: number;
   passedTests: number;
   failedTests: number;

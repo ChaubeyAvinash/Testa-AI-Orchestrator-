@@ -4,6 +4,7 @@ export interface ProjectDto {
   url: string;
   createdAt: string;
   updatedAt: string;
+  executionCount?: number;
 }
 
 export interface CreateProjectDto {

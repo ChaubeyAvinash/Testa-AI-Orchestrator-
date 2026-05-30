@@ -24,6 +24,7 @@ model Execution {
   customPrompt  String?
   generatedCode String?
   crawlResult   String?
+  isMock        Boolean         @default(false)
   totalTests    Int             @default(0)
   passedTests   Int             @default(0)
   failedTests   Int             @default(0)

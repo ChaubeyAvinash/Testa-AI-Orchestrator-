@@ -126,7 +126,7 @@ export class ExecutionsService {
 
       await this.prisma.execution.update({
         where: { id: executionId },
-        data: { generatedCode, status: ExecutionStatus.RUNNING },
+        data: { generatedCode, status: ExecutionStatus.RUNNING, isMock },
       });
       emit('generation_complete', { linesOfCode, isMock });
 
