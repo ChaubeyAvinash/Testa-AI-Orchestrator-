@@ -7,3 +7,4 @@ onlyBuiltDependencies:
   - 'prisma'
   - 'unrs-resolver'
   - 'esbuild'
+  - 'sharp'
