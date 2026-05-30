@@ -63,9 +63,13 @@ step "Building shared types..."
 npm run build --workspace=packages/shared
 ok "Shared package built"
 
-# ── 5. Run database migration ──────────────────────────────────────────────────
-step "Running database migrations (SQLite)..."
+# ── 5. Generate Prisma client + run migrations ─────────────────────────────────
+step "Generating Prisma client..."
 cd apps/api
+DATABASE_URL="file:./dev.db" npx prisma generate --schema=./prisma/schema.prisma 2>&1 | grep -v "^$" | tail -3
+ok "Prisma client ready"
+
+step "Running database migrations (SQLite)..."
 DATABASE_URL="file:./dev.db" npx prisma migrate deploy --schema=./prisma/schema.prisma 2>&1 | grep -E "migrat|sync|error" || true
 ok "Database ready at apps/api/dev.db"
 cd ../..

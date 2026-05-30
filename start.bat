@@ -53,10 +53,14 @@ echo [TESTA] Building shared types...
 call npm run build --workspace=packages/shared
 echo   OK  Shared package built
 
-:: ── 5. Run database migration ─────────────────────────────────────────────────
-echo [TESTA] Running database migration ^(SQLite^)...
+:: ── 5. Generate Prisma client + run migrations ────────────────────────────────
+echo [TESTA] Generating Prisma client...
 cd apps\api
 set DATABASE_URL=file:./dev.db
+call npx prisma generate --schema=./prisma/schema.prisma
+echo   OK  Prisma client ready
+
+echo [TESTA] Running database migration ^(SQLite^)...
 call npx prisma migrate deploy --schema=./prisma/schema.prisma
 echo   OK  Database ready at apps\api\dev.db
 cd ..\..
