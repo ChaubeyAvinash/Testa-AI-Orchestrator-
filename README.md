@@ -1,17 +1,28 @@
 <div align="center">
 
-# TESTA
+<br/>
 
-### AI-Powered Autonomous Web Testing Platform
+```
+  >  TESTA
+```
 
-**Enter a URL → AI crawls the site → generates Playwright tests → executes them → diagnoses failures → delivers a full report**
+# AI-Powered Autonomous Web Testing Platform
 
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)
-![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=flat&logo=nestjs&logoColor=white)
-![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat&logo=nextdotjs&logoColor=white)
-![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=flat&logo=playwright&logoColor=white)
-![Azure AI](https://img.shields.io/badge/Azure_AI_Foundry-0078D4?style=flat&logo=microsoftazure&logoColor=white)
-![SQLite](https://img.shields.io/badge/SQLite-003B57?style=flat&logo=sqlite&logoColor=white)
+**No test scripts. No configuration. Just a URL.**
+
+TESTA crawls your website, writes Playwright tests using GPT-5.1, executes them, and delivers an AI-diagnosed failure report — all in one click.
+
+<br/>
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com/)
+[![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright&logoColor=white)](https://playwright.dev/)
+[![Azure AI](https://img.shields.io/badge/Azure_AI_Foundry-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)](https://ai.azure.com/)
+[![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://sqlite.org/)
+[![pnpm](https://img.shields.io/badge/pnpm-F69220?style=for-the-badge&logo=pnpm&logoColor=white)](https://pnpm.io/)
+
+<br/>
 
 </div>
 
@@ -19,23 +30,48 @@
 
 ## What is TESTA?
 
-TESTA is a zero-configuration AI test orchestrator. Point it at any website and it will:
+TESTA is an AI-powered autonomous testing agent. You give it a URL — it does everything else.
 
-1. **Crawl** — Playwright-powered breadth-first spider discovers every page, form, and interactive element
-2. **Generate** — Azure AI Foundry (GPT-5.1) writes a complete Playwright `.spec.ts` test suite from what it found
-3. **Execute** — Playwright runs the tests, captures screenshots on failure
-4. **Analyze** — GPT-5.1 reads each failure and produces a concise, actionable diagnosis
-5. **Report** — Dashboard shows pass rate, charts, AI suggestions, and failure screenshots
+```
+  You                        TESTA
+  ───                        ─────
+  Enter URL        ──►  Crawl every page & element
+  Select test types ──►  GPT-5.1 writes .spec.ts tests
+  Click Run         ──►  Playwright executes the suite
+                    ──►  GPT-5.1 diagnoses each failure
+                    ──►  Dashboard report with screenshots
+```
 
-Live progress streams to the browser over **Server-Sent Events** in real time.
+Live execution progress streams to the browser over **Server-Sent Events** in real time — no polling, no refresh.
 
 ---
 
-## Screenshots
+## Key Features
 
-| New Test Run | Live Execution | Report Dashboard |
-|:---:|:---:|:---:|
-| Accenture-style form — enter URL + pick test types | Stage pipeline + live log terminal | Pass rate, pie chart, AI diagnosis per failure |
+| Feature | Description |
+|---|---|
+| 🕷️ **AI Crawler** | Playwright breadth-first spider — discovers pages, forms, buttons, inputs |
+| 🤖 **Test Generation** | GPT-5.1 writes a complete `.spec.ts` file tailored to what it found |
+| ▶️ **Playwright Runner** | Executes generated tests in Chromium, captures screenshots on failure |
+| 🔍 **AI Failure Analysis** | GPT-5.1 reads error + stack trace + code and gives a 3–5 sentence fix |
+| 📡 **Live SSE Stream** | Every stage transition and test result streams to the UI in real time |
+| 📊 **Report Dashboard** | Pass rate, Recharts pie chart, result table, AI suggestions, screenshot lightbox |
+| 🗄️ **Zero Infrastructure** | SQLite — no Docker, no Postgres, no Redis. One file. |
+| 🎨 **Accenture UI** | Black/purple enterprise design system — sharp, professional, no rounded corners |
+
+---
+
+## Test Types
+
+Choose one or more when starting a run:
+
+| Type | What it tests |
+|---|---|
+| **Navigation** | Every discovered page loads, returns no error, has a non-empty title |
+| **Form Validation** | Fills and submits every form with realistic data, asserts success/error states |
+| **Accessibility** | Alt text on images, ARIA labels on buttons, proper heading hierarchy |
+| **Visual Regression** | Full-page screenshots of key pages for comparison |
+| **API Intercept** | Intercepts XHR/fetch calls and asserts they return 2xx status codes |
 
 ---
 
@@ -44,43 +80,59 @@ Live progress streams to the browser over **Server-Sent Events** in real time.
 | Layer | Technology |
 |---|---|
 | **Frontend** | Next.js 16 (App Router) · TypeScript · Tailwind CSS · Recharts |
-| **Backend** | NestJS · TypeScript · Prisma v7 |
-| **Database** | SQLite (via `@prisma/adapter-libsql`) — no server needed |
-| **AI** | Azure AI Foundry · GPT-5.1 via `@azure-rest/ai-inference` |
-| **Testing Engine** | Playwright — crawling + test execution |
-| **Real-time** | Server-Sent Events (SSE) via NestJS `@Sse()` + RxJS |
-| **Monorepo** | pnpm workspaces |
-| **Launch** | Shell script (`start.sh` / `start.bat`) |
+| **Backend** | NestJS 11 · TypeScript · Prisma v7 |
+| **Database** | SQLite via `@prisma/adapter-libsql` — no server required |
+| **AI Model** | Azure AI Foundry · GPT-5.1 via `@azure-rest/ai-inference` |
+| **Browser Engine** | Playwright — used for both crawling and test execution |
+| **Real-time** | Server-Sent Events · NestJS `@Sse()` · RxJS Subjects |
+| **Monorepo** | pnpm workspaces (`apps/api`, `apps/web`, `packages/shared`) |
+| **Launch** | `start.sh` (Linux/macOS/Git Bash) · `start.bat` (Windows) |
 
 ---
 
 ## Project Structure
 
 ```
-testa/
+Testa-AI-Orchestrator/
+│
+├── start.sh                        ← One-command launcher (Linux/macOS/Git Bash)
+├── start.bat                       ← One-command launcher (Windows CMD)
+├── .env.example                    ← Environment variable template
+│
 ├── apps/
-│   ├── api/                        # NestJS backend
+│   │
+│   ├── api/                        ← NestJS backend (port 3001)
 │   │   ├── src/
-│   │   │   ├── crawler/            # Playwright breadth-first spider
-│   │   │   ├── test-generator/     # Azure AI → .spec.ts generation
-│   │   │   ├── test-runner/        # child_process Playwright runner
-│   │   │   ├── ai-analysis/        # GPT-5.1 failure diagnosis
-│   │   │   ├── executions/         # Pipeline orchestrator + SSE
-│   │   │   ├── projects/           # Project CRUD
-│   │   │   ├── sse/                # RxJS Subject stream manager
-│   │   │   └── prisma/             # Prisma service
+│   │   │   ├── crawler/            ← Playwright spider
+│   │   │   ├── test-generator/     ← GPT-5.1 prompt + .spec.ts output
+│   │   │   ├── test-runner/        ← child_process + JSON reporter
+│   │   │   ├── ai-analysis/        ← Per-failure GPT-5.1 diagnosis
+│   │   │   ├── executions/         ← Pipeline orchestrator + SSE emitter
+│   │   │   ├── projects/           ← Project CRUD
+│   │   │   ├── sse/                ← RxJS Subject stream manager
+│   │   │   └── prisma/             ← Prisma service (SQLite)
 │   │   └── prisma/
-│   │       ├── schema.prisma       # SQLite schema
+│   │       ├── schema.prisma
 │   │       └── migrations/
 │   │
-│   └── web/                        # Next.js 16 frontend
-│       └── src/app/
-│           ├── projects/new/       # URL input + test type selector
-│           ├── executions/[id]/    # Live SSE progress view
-│           └── executions/[id]/report/  # Final report dashboard
+│   └── web/                        ← Next.js 16 frontend (port 3000)
+│       └── src/
+│           ├── app/
+│           │   ├── projects/new/           ← URL + test type form
+│           │   ├── executions/[id]/        ← Live SSE progress view
+│           │   └── executions/[id]/report/ ← Final report dashboard
+│           ├── hooks/
+│           │   └── useSSEStream.ts         ← EventSource wrapper
+│           └── lib/
+│               └── api-client.ts           ← Typed fetch wrapper
 │
 └── packages/
-    └── shared/                     # Shared TypeScript types (SSE events, DTOs)
+    └── shared/                     ← Shared TypeScript types
+        └── src/types/
+            ├── enums.ts            ← ExecutionStatus, TestStatus, TestType
+            ├── execution.ts        ← ExecutionDto, TestResultDto
+            ├── project.ts          ← ProjectDto
+            └── sse-events.ts       ← All SSE event shapes
 ```
 
 ---
@@ -89,113 +141,119 @@ testa/
 
 ### Prerequisites
 
-- **Node.js** ≥ 20
-- **pnpm** — installed automatically by the start script if missing
-- An **Azure AI Foundry** project with GPT-5.1 deployed
-  → [Get started at ai.azure.com](https://ai.azure.com)
+- **Node.js** ≥ 20 — [nodejs.org](https://nodejs.org)
+- **Azure AI Foundry** account with **GPT-5.1** deployed — [ai.azure.com](https://ai.azure.com)
+- pnpm is installed automatically if missing
 
-### 1. Clone
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/ChaubeyAvinash/Testa-AI-Orchestrator-.git
 cd Testa-AI-Orchestrator-
 ```
 
-### 2. Configure Azure AI credentials
+### 2. Add your Azure AI credentials
 
 ```bash
 cp .env.example apps/api/.env
 ```
 
-Edit `apps/api/.env`:
+Open `apps/api/.env` and fill in:
 
 ```env
-# SQLite — no server needed
+# Database — SQLite file, no server needed
 DATABASE_URL=file:./dev.db
 
-# Azure AI Foundry — ai.azure.com → your project → Deployments
+# Azure AI Foundry
+# → ai.azure.com  →  your project  →  Deployments
 AZURE_INFERENCE_ENDPOINT=https://<your-project>.services.ai.azure.com/models
-AZURE_AI_API_KEY=<your-azure-ai-key>
+AZURE_AI_API_KEY=<your-api-key>
 AZURE_AI_MODEL=gpt-5.1
 ```
 
-### 3. Run
+### 3. Launch
 
 **Linux / macOS / Git Bash**
-
 ```bash
 bash start.sh
 ```
 
 **Windows (Command Prompt)**
-
 ```bat
 start.bat
 ```
 
-The script handles everything automatically:
+The script is fully automatic — no manual steps:
 
-| Step | What it does |
+```
+  ① Check Node.js is installed
+  ② Install pnpm if missing
+  ③ Detect missing .env → copy from template + prompt to fill in
+  ④ pnpm install  (skipped if node_modules already exists)
+  ⑤ Build packages/shared (TypeScript types)
+  ⑥ prisma migrate deploy  (creates apps/api/dev.db)
+  ⑦ Start API + Frontend concurrently with colour-coded logs
+```
+
+### 4. Open the app
+
+| Service | URL |
 |---|---|
-| ① Prerequisites | Checks Node.js, installs pnpm if missing |
-| ② Environment | Detects missing `.env` and prompts to fill it |
-| ③ Dependencies | Runs `pnpm install` if `node_modules` is absent |
-| ④ Shared types | Builds `packages/shared` |
-| ⑤ Migration | Applies SQLite migrations (`apps/api/dev.db`) |
-| ⑥ Start | Launches API + Frontend concurrently with colour-coded logs |
-
-Services:
-- **Frontend** → http://localhost:3000
-- **API** → http://localhost:3001/api/v1
+| **Frontend** | http://localhost:3000 |
+| **API** | http://localhost:3001/api/v1 |
+| **Health check** | http://localhost:3001/api/v1/health |
 
 ---
 
-## Usage
+## How to Use
 
-1. Open **http://localhost:3000**
-2. Enter a **project name** and **target URL** (e.g. `https://example.com`)
-3. Select **test types**:
-   - Navigation Testing — all pages load without errors
-   - Form Validation — fills and submits every form
-   - Accessibility Audit — alt text, ARIA labels, heading hierarchy
-   - Visual Regression — full-page screenshots
-   - API Intercept — asserts XHR/fetch calls return 2xx
+1. Go to **http://localhost:3000** — you land on the **New Test Run** form
+2. Enter a **Project Name** and **Target URL**
+3. Select **test coverage types** (navigation, forms, accessibility, etc.)
 4. Click **Generate & Execute Tests `>`**
-5. Watch the live pipeline: **Crawl → Generate → Execute → Analyze**
-6. View the report — pass rate, AI failure diagnosis, screenshots
+5. Watch the live pipeline on the **Execution** screen:
+   ```
+   CRAWL  ──►  GENERATE  ──►  EXECUTE  ──►  ANALYZE
+   ```
+6. Auto-redirected to the **Report Dashboard** when complete
+7. Expand any failed test to see:
+   - Error message and stack trace
+   - **AI Diagnosis** — plain-English explanation + fix suggestion
+   - **Failure screenshot** (click to enlarge)
 
 ---
 
 ## API Reference
 
-Base URL: `http://localhost:3001/api/v1`
+**Base URL:** `http://localhost:3001/api/v1`
 
-| Method | Endpoint | Description |
+| Method | Endpoint | Body / Notes |
 |---|---|---|
-| `GET` | `/health` | Liveness check |
+| `GET` | `/health` | `{ status, db }` |
 | `GET` | `/projects` | List all projects |
-| `POST` | `/projects` | Create project `{ name, url }` |
-| `GET` | `/projects/:id` | Get project + execution history |
-| `POST` | `/executions` | Start execution `{ projectId, testTypes[] }` |
-| `GET` | `/executions/:id` | Get execution status |
-| `GET` | `/executions/:id/stream` | **SSE** — live progress events |
-| `GET` | `/executions/:id/results` | All test results |
-| `GET` | `/executions/:id/generated-code` | Raw generated `.spec.ts` |
-| `GET` | `/projects/:id/executions` | Execution history |
+| `POST` | `/projects` | `{ name, url }` |
+| `GET` | `/projects/:id` | Project + last 10 executions |
+| `DELETE` | `/projects/:id` | Remove project + cascade |
+| `POST` | `/executions` | `{ projectId, testTypes[] }` |
+| `GET` | `/executions/:id` | Execution status + counts |
+| `GET` | `/executions/:id/stream` | **SSE** — live events until complete |
+| `GET` | `/executions/:id/results` | All `TestResult` rows |
+| `GET` | `/executions/:id/generated-code` | Raw `.spec.ts` text |
+| `GET` | `/projects/:id/executions` | Execution history for a project |
 
----
+### SSE Event Types
 
-## SSE Event Stream
-
-The `/executions/:id/stream` endpoint sends typed events in real time:
+`GET /executions/:id/stream` streams newline-delimited JSON:
 
 ```jsonc
-{ "event": "stage_change",        "data": { "stage": "CRAWLING",   "message": "Crawling website..." } }
-{ "event": "crawl_progress",      "data": { "pagesFound": 5,        "currentUrl": "https://..." } }
-{ "event": "generation_complete", "data": { "linesOfCode": 142 } }
-{ "event": "test_complete",       "data": { "testName": "...",      "status": "PASSED", "duration": 1240 } }
-{ "event": "analysis_complete",   "data": { "failuresAnalyzed": 2 } }
-{ "event": "execution_complete",  "data": { "totalTests": 18,       "passedTests": 16, "failedTests": 2 } }
+{ "event": "stage_change",        "data": { "stage": "CRAWLING",  "message": "Crawling website..." }}
+{ "event": "crawl_progress",      "data": { "pagesFound": 7,       "currentUrl": "https://..." }}
+{ "event": "generation_complete", "data": { "linesOfCode": 183 }}
+{ "event": "test_started",        "data": { "testName": "Login page loads" }}
+{ "event": "test_complete",       "data": { "testName": "...", "status": "FAILED", "duration": 3200, "errorMessage": "..." }}
+{ "event": "analysis_complete",   "data": { "failuresAnalyzed": 3 }}
+{ "event": "execution_complete",  "data": { "totalTests": 20, "passedTests": 17, "failedTests": 3 }}
+{ "event": "error",               "data": { "message": "..." }}
 ```
 
 ---
@@ -204,97 +262,143 @@ The `/executions/:id/stream` endpoint sends typed events in real time:
 
 | Variable | Required | Default | Description |
 |---|---|---|---|
-| `DATABASE_URL` | Yes | `file:./dev.db` | SQLite file path |
-| `AZURE_INFERENCE_ENDPOINT` | Yes | — | Azure AI Foundry endpoint URL |
-| `AZURE_AI_API_KEY` | Yes | — | Azure AI API key |
-| `AZURE_AI_MODEL` | No | `gpt-5.1` | Model deployment name |
-| `PORT` | No | `3001` | API server port |
-| `CORS_ORIGIN` | No | `http://localhost:3000` | Allowed frontend origin |
-| `CRAWLER_MAX_PAGES` | No | `20` | Max pages to crawl per run |
-| `CRAWLER_TIMEOUT` | No | `60000` | Crawl timeout (ms) |
-| `PLAYWRIGHT_TEST_TIMEOUT` | No | `30000` | Per-test timeout (ms) |
-| `PLAYWRIGHT_MAX_CONCURRENCY` | No | `2` | Parallel test workers |
-| `NEXT_PUBLIC_API_URL` | No | `http://localhost:3001` | Frontend → API URL |
+| `DATABASE_URL` | ✅ | `file:./dev.db` | SQLite file path |
+| `AZURE_INFERENCE_ENDPOINT` | ✅ | — | Azure AI Foundry endpoint |
+| `AZURE_AI_API_KEY` | ✅ | — | Azure AI API key |
+| `AZURE_AI_MODEL` | | `gpt-5.1` | Deployed model name |
+| `PORT` | | `3001` | API server port |
+| `CORS_ORIGIN` | | `http://localhost:3000` | Allowed frontend origin |
+| `CRAWLER_MAX_PAGES` | | `20` | Max pages crawled per run |
+| `CRAWLER_TIMEOUT` | | `60000` | Total crawl timeout (ms) |
+| `PLAYWRIGHT_TEST_TIMEOUT` | | `30000` | Per-test timeout (ms) |
+| `PLAYWRIGHT_MAX_CONCURRENCY` | | `2` | Playwright parallel workers |
+| `NEXT_PUBLIC_API_URL` | | `http://localhost:3001` | API URL used by the browser |
 
 ---
 
-## Architecture Deep Dive
+## Architecture
 
 ### Execution Pipeline
 
 ```
-POST /executions
-        │
-        ▼
-  CrawlerService                   Playwright chromium.launch()
-  Breadth-first spider             Max CRAWLER_MAX_PAGES pages
-  Discovers: pages, forms,    ────► Emits: crawl_progress (SSE)
-  buttons, inputs, links
-        │
-        ▼
-  TestGeneratorService             Azure AI Foundry GPT-5.1
-  Builds structured prompt    ────► Returns: full .spec.ts file
-  with page + element context      Emits: generation_complete (SSE)
-        │
-        ▼
-  TestRunnerService                child_process spawn
-  Writes spec to tmpdir       ────► npx playwright test --reporter=json
-  Parses results.json              Emits: test_complete per test (SSE)
-  Captures failure screenshots
-        │
-        ▼
-  AiAnalysisService                Azure AI Foundry GPT-5.1
-  Per-failure: error +        ────► 3-5 sentence plain-text diagnosis
-  stack + code snippet             Max 3 concurrent calls
-  Emits: analysis_complete (SSE)
-        │
-        ▼
-  Persist to SQLite (Prisma)
-  Emit: execution_complete (SSE)
+  User clicks "Generate & Execute"
+          │
+          ▼
+  ┌─────────────────────────────────────────────────────────────┐
+  │  CrawlerService                                             │
+  │  Playwright chromium.launch() · breadth-first BFS          │
+  │  Discovers pages, forms, buttons, inputs, links            │
+  │  Emits: crawl_progress events via SSE                      │
+  └───────────────────────────┬─────────────────────────────────┘
+                              │  CrawlResult { pages[] }
+                              ▼
+  ┌─────────────────────────────────────────────────────────────┐
+  │  TestGeneratorService                                       │
+  │  Builds structured prompt from CrawlResult + testTypes     │
+  │  Calls Azure AI Foundry GPT-5.1                            │
+  │  Returns: complete .spec.ts file                           │
+  │  Emits: generation_complete via SSE                        │
+  └───────────────────────────┬─────────────────────────────────┘
+                              │  generatedCode: string
+                              ▼
+  ┌─────────────────────────────────────────────────────────────┐
+  │  TestRunnerService                                          │
+  │  Writes spec + config to os.tmpdir()                       │
+  │  Spawns: npx playwright test --reporter=json               │
+  │  Parses results.json → TestRunResult[]                     │
+  │  Captures base64 screenshots for failures                  │
+  │  Emits: test_complete per test via SSE                     │
+  └───────────────────────────┬─────────────────────────────────┘
+                              │  TestRunResult[]
+                              ▼
+  ┌─────────────────────────────────────────────────────────────┐
+  │  AiAnalysisService                                          │
+  │  For each FAILED test: sends error + stack + code to GPT   │
+  │  Max 3 concurrent calls                                    │
+  │  Returns: Map<testName, aiSuggestion>                      │
+  │  Emits: analysis_complete via SSE                          │
+  └───────────────────────────┬─────────────────────────────────┘
+                              │
+                              ▼
+  Persist TestResult rows to SQLite (Prisma)
+  Emit: execution_complete  →  frontend redirects to /report
 ```
 
-### Database Schema
+### Data Model
 
 ```
-Project ──< Execution ──< TestResult
+Project
+  id, name, url, createdAt
+  └── Execution[]
+        id, status, testTypes, generatedCode, crawlResult
+        passedTests, failedTests, totalTests, startedAt, completedAt
+        └── TestResult[]
+              id, testName, status, duration
+              errorMessage, stackTrace
+              screenshotBase64, aiSuggestion
 ```
 
-- `Project` — name + URL
-- `Execution` — status, testTypes (JSON), crawlResult, generated code, counts
-- `TestResult` — per-test: status, duration, error, screenshot (base64), AI suggestion
+### Real-time Architecture
 
-### Real-time Streaming
-
-`SseService` holds a `Map<executionId, Subject<SSEEvent>>`. The pipeline emits events at every stage boundary and after each individual test completes. The frontend `useSSEStream` hook wraps the browser `EventSource` API and auto-redirects to the report on `execution_complete`.
+```
+  ExecutionsService.runPipeline()
+          │ sseService.emit(executionId, event)
+          ▼
+  SseService  ←  Map<executionId, Subject<SSEEvent>>
+          │ Observable<SSEEvent>
+          ▼
+  ExecutionsController  @Sse(':id/stream')
+          │ text/event-stream
+          ▼
+  Browser  →  useSSEStream hook  →  React state updates
+```
 
 ---
 
-## Scripts
+## Scripts Reference
 
-| Command | Description |
-|---|---|
-| `bash start.sh` | Start everything (Linux/macOS/Git Bash) |
-| `start.bat` | Start everything (Windows CMD) |
-| `make start` | Alias for `bash start.sh` |
-| `make build` | Build all packages |
-| `make migrate` | Apply SQLite migrations |
-| `make clean` | Remove build artifacts |
+| Command | Platform | Description |
+|---|---|---|
+| `bash start.sh` | Linux / macOS / Git Bash | Full auto-start |
+| `start.bat` | Windows CMD | Full auto-start |
+| `make start` | Any (with make) | Alias for `bash start.sh` |
+| `make build` | Any | Build all packages |
+| `make migrate` | Any | Apply SQLite migrations |
+| `make clean` | Any | Remove `dist/`, `.next/` |
 
-### Manual dev commands
+**Individual dev commands:**
 
 ```bash
-# API in watch mode only
+# API only (hot reload)
 pnpm --filter api start:dev
 
-# Frontend in dev mode only
+# Frontend only
 pnpm --filter @testa/web dev
 
-# Build shared types
+# Rebuild shared types
 pnpm --filter @testa/shared build
+
+# Prisma migration (create new)
+cd apps/api && DATABASE_URL=file:./dev.db npx prisma migrate dev --name <name>
+
+# Open Prisma Studio (DB browser)
+cd apps/api && DATABASE_URL=file:./dev.db npx prisma studio
 ```
+
+---
+
+## Roadmap
+
+- [ ] BullMQ job queue for concurrent multi-user execution
+- [ ] Self-healing — auto-repair broken selectors using AI
+- [ ] Natural language test commands (`"Test the checkout flow"`)
+- [ ] CI/CD integration (GitHub Actions, Jenkins)
+- [ ] Multi-browser execution (Firefox, WebKit)
+- [ ] Scheduled test runs with email/Slack notifications
+- [ ] Test history comparison and trend charts
 
 ---
 
 ## License
 
-MIT
+MIT © [Avinash Chaubey](https://github.com/ChaubeyAvinash)
