@@ -1,25 +1,31 @@
-.PHONY: dev prod migrate seed logs build
+.PHONY: start install migrate build lint clean
 
-dev:
-	docker compose -f docker-compose.yml -f docker-compose.override.yml up
+# Start both API and frontend (Linux/macOS/Git Bash)
+start:
+	bash start.sh
 
-prod:
-	docker compose up --build
+# Install all workspace dependencies
+install:
+	pnpm install
 
+# Build shared package + both apps
+build:
+	pnpm --filter @testa/shared build
+	pnpm --filter api build
+	pnpm --filter @testa/web build
+
+# Apply SQLite migrations
 migrate:
-	docker compose exec api npx prisma migrate dev
+	cd apps/api && DATABASE_URL=file:./dev.db npx prisma migrate deploy
 
-db-push:
-	cd apps/api && DATABASE_URL=$(DATABASE_URL) npx prisma db push
-
+# Regenerate Prisma client
 generate:
-	cd apps/api && DATABASE_URL=$(DATABASE_URL) npx prisma generate
+	cd apps/api && DATABASE_URL=file:./dev.db npx prisma generate
 
-logs:
-	docker compose logs -f api
+# Run linters across the monorepo
+lint:
+	pnpm -r lint
 
-stop:
-	docker compose down
-
+# Remove build artifacts
 clean:
-	docker compose down -v
+	rm -rf apps/api/dist apps/web/.next packages/shared/dist

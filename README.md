@@ -50,7 +50,7 @@ Live progress streams to the browser over **Server-Sent Events** in real time.
 | **Testing Engine** | Playwright — crawling + test execution |
 | **Real-time** | Server-Sent Events (SSE) via NestJS `@Sse()` + RxJS |
 | **Monorepo** | pnpm workspaces |
-| **Containers** | Docker + docker-compose (optional) |
+| **Launch** | Shell script (`start.sh` / `start.bat`) |
 
 ---
 
@@ -85,73 +85,68 @@ testa/
 
 ---
 
-## Quick Start — Local Dev (no Docker)
+## Quick Start
 
 ### Prerequisites
 
 - **Node.js** ≥ 20
-- **pnpm** (`npm install -g pnpm`)
+- **pnpm** — installed automatically by the start script if missing
 - An **Azure AI Foundry** project with GPT-5.1 deployed
   → [Get started at ai.azure.com](https://ai.azure.com)
 
-### 1. Clone & Install
+### 1. Clone
 
 ```bash
 git clone https://github.com/ChaubeyAvinash/Testa-AI-Orchestrator-.git
 cd Testa-AI-Orchestrator-
-pnpm install
 ```
 
-### 2. Configure Environment
+### 2. Configure Azure AI credentials
 
 ```bash
 cp .env.example apps/api/.env
 ```
 
-Edit `apps/api/.env` and fill in your Azure AI credentials:
+Edit `apps/api/.env`:
 
 ```env
-# Database — SQLite file, no server needed
+# SQLite — no server needed
 DATABASE_URL=file:./dev.db
 
-# Azure AI Foundry — get from ai.azure.com → your project → Deployments
+# Azure AI Foundry — ai.azure.com → your project → Deployments
 AZURE_INFERENCE_ENDPOINT=https://<your-project>.services.ai.azure.com/models
 AZURE_AI_API_KEY=<your-azure-ai-key>
 AZURE_AI_MODEL=gpt-5.1
 ```
 
-### 3. Run Database Migration
+### 3. Run
+
+**Linux / macOS / Git Bash**
 
 ```bash
-cd apps/api
-DATABASE_URL=file:./dev.db npx prisma migrate deploy
-cd ../..
+bash start.sh
 ```
 
-### 4. Start
+**Windows (Command Prompt)**
 
-```bash
-pnpm dev
-# API  → http://localhost:3001/api/v1/health
-# Web  → http://localhost:3000
+```bat
+start.bat
 ```
 
----
+The script handles everything automatically:
 
-## Quick Start — Docker
-
-```bash
-# 1. Add your Azure AI keys to .env
-cp .env.example .env
-# edit AZURE_INFERENCE_ENDPOINT and AZURE_AI_API_KEY
-
-# 2. Build and run
-docker compose up --build
-```
+| Step | What it does |
+|---|---|
+| ① Prerequisites | Checks Node.js, installs pnpm if missing |
+| ② Environment | Detects missing `.env` and prompts to fill it |
+| ③ Dependencies | Runs `pnpm install` if `node_modules` is absent |
+| ④ Shared types | Builds `packages/shared` |
+| ⑤ Migration | Applies SQLite migrations (`apps/api/dev.db`) |
+| ⑥ Start | Launches API + Frontend concurrently with colour-coded logs |
 
 Services:
-- Frontend → http://localhost:3000
-- API → http://localhost:3001/api/v1
+- **Frontend** → http://localhost:3000
+- **API** → http://localhost:3001/api/v1
 
 ---
 
@@ -274,20 +269,28 @@ Project ──< Execution ──< TestResult
 
 ---
 
-## Contributing
+## Scripts
+
+| Command | Description |
+|---|---|
+| `bash start.sh` | Start everything (Linux/macOS/Git Bash) |
+| `start.bat` | Start everything (Windows CMD) |
+| `make start` | Alias for `bash start.sh` |
+| `make build` | Build all packages |
+| `make migrate` | Apply SQLite migrations |
+| `make clean` | Remove build artifacts |
+
+### Manual dev commands
 
 ```bash
-# Run API in watch mode
+# API in watch mode only
 pnpm --filter api start:dev
 
-# Run frontend in dev mode
+# Frontend in dev mode only
 pnpm --filter @testa/web dev
 
-# Type-check shared package
+# Build shared types
 pnpm --filter @testa/shared build
-
-# Build all
-pnpm build
 ```
 
 ---
