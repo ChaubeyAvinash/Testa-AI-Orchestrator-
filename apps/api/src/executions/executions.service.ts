@@ -121,7 +121,7 @@ export class ExecutionsService {
       });
       emit('stage_change', { stage: ExecutionStatus.GENERATING, message: 'Generating Playwright tests with AI...' });
 
-      const { code: generatedCode, isMock } = await this.generator.generate(crawlResult, testTypes, customPrompt);
+      let { code: generatedCode, isMock } = await this.generator.generate(crawlResult, testTypes, customPrompt);
       const linesOfCode = generatedCode.split('\n').length;
 
       await this.prisma.execution.update({
@@ -149,6 +149,7 @@ export class ExecutionsService {
             status: result.status,
             duration: result.duration,
             errorMessage: result.errorMessage,
+            screenshotBase64: result.screenshotBase64,
           });
         }
       } else {
@@ -159,10 +160,14 @@ export class ExecutionsService {
               status: result.status,
               duration: result.duration,
               errorMessage: result.errorMessage,
+              screenshotBase64: result.screenshotBase64,
             });
           });
         } catch (runErr) {
+          // Real runner failed — fall back to sample results and mark isMock true
           this.logger.warn(`Playwright runner failed — using sample results. Reason: ${runErr}`);
+          isMock = true;
+          await this.prisma.execution.update({ where: { id: executionId }, data: { isMock: true } });
           runResults = getMockResults(testTypes);
           for (const result of runResults) {
             await new Promise((r) => setTimeout(r, 120));
@@ -171,6 +176,7 @@ export class ExecutionsService {
               status: result.status,
               duration: result.duration,
               errorMessage: result.errorMessage,
+              screenshotBase64: result.screenshotBase64,
             });
           }
         }

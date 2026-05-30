@@ -7,6 +7,14 @@ import type { SSEEvent, StageChangeData, TestCompleteData, CrawlProgressData } f
 import { ExecutionStatus, TestStatus } from '@testa/shared';
 
 type LogEntry = { time: string; message: string; level: 'pass' | 'fail' | 'info' | 'log' };
+type FailedResult = { testName: string; errorMessage?: string; screenshotBase64?: string; duration: number };
+
+// '<svg' base64-encodes to 'PHN2'
+function screenshotSrc(base64: string): string {
+  return base64.startsWith('PHN2')
+    ? `data:image/svg+xml;base64,${base64}`
+    : `data:image/png;base64,${base64}`;
+}
 
 const STAGES = [
   { id: ExecutionStatus.CRAWLING,   label: 'CRAWL'    },
@@ -29,6 +37,8 @@ export default function ExecutionPage({ params }: { params: Promise<{ id: string
   const [failed, setFailed] = useState(0);
   const [pages, setPages] = useState(0);
   const [done, setDone] = useState(false);
+  const [failedResults, setFailedResults] = useState<FailedResult[]>([]);
+  const [expandedScreenshot, setExpandedScreenshot] = useState<string | null>(null);
 
   const addLog = (message: string, level: LogEntry['level'] = 'log') =>
     setLog((prev) => [...prev, { time: new Date().toLocaleTimeString('en', { hour12: false }), message, level }]);
@@ -58,6 +68,12 @@ export default function ExecutionPage({ params }: { params: Promise<{ id: string
         } else {
           setFailed((f) => f + 1);
           addLog(`FAIL  ${d.testName}  ${d.errorMessage ? '— ' + d.errorMessage.slice(0, 80) : ''}`, 'fail');
+          setFailedResults((prev) => [...prev, {
+            testName: d.testName,
+            errorMessage: d.errorMessage,
+            screenshotBase64: d.screenshotBase64,
+            duration: d.duration,
+          }]);
         }
         break;
       }
@@ -172,6 +188,84 @@ export default function ExecutionPage({ params }: { params: Promise<{ id: string
           )}
         </div>
       </div>
+
+      {/* Failed test screenshots — appear live as tests fail */}
+      {failedResults.length > 0 && (
+        <div className="border border-[#1e1e1e]">
+          <div className="border-b border-[#1e1e1e] px-5 py-3 bg-[#0d0d0d] flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold tracking-widest uppercase text-[#ff3333]">
+                Failed Tests
+              </span>
+              <span className="text-xs font-mono text-[#444]">({failedResults.length})</span>
+            </div>
+          </div>
+
+          <div className="divide-y divide-[#1e1e1e]">
+            {failedResults.map((r, i) => (
+              <div key={i} className="p-5 space-y-3">
+                {/* Test name + duration */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-bold tracking-widest px-2 py-0.5 bg-[#ff333318] text-[#ff3333]">
+                      FAIL
+                    </span>
+                    <span className="text-sm text-[#ccc] font-mono">{r.testName}</span>
+                  </div>
+                  <span className="text-xs text-[#444] font-mono flex-shrink-0">{r.duration}ms</span>
+                </div>
+
+                {/* Error message */}
+                {r.errorMessage && (
+                  <pre className="text-xs text-[#737373] bg-[#0d0d0d] border border-[#1e1e1e] p-3 overflow-x-auto whitespace-pre-wrap leading-relaxed font-mono">
+                    {r.errorMessage}
+                  </pre>
+                )}
+
+                {/* Screenshot */}
+                {r.screenshotBase64 && (
+                  <div>
+                    <div className="text-xs tracking-widest uppercase text-[#444] mb-2">Failure Screenshot</div>
+                    <button
+                      onClick={() => setExpandedScreenshot(r.screenshotBase64!)}
+                      className="block hover:opacity-80 transition-opacity"
+                    >
+                      <img
+                        src={screenshotSrc(r.screenshotBase64)}
+                        alt={`Failure screenshot — ${r.testName}`}
+                        className="max-h-44 border border-[#1e1e1e]"
+                      />
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Fullscreen screenshot lightbox */}
+      {expandedScreenshot && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-8"
+          style={{ background: 'rgba(0,0,0,0.92)' }}
+          onClick={() => setExpandedScreenshot(null)}
+        >
+          <div className="relative" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setExpandedScreenshot(null)}
+              className="absolute -top-10 right-0 text-xs tracking-widest uppercase text-[#737373] hover:text-[#a100ff] transition-colors"
+            >
+              {'>'} CLOSE
+            </button>
+            <img
+              src={screenshotSrc(expandedScreenshot)}
+              alt="Screenshot"
+              className="max-w-full max-h-screen border border-[#1e1e1e]"
+            />
+          </div>
+        </div>
+      )}
 
     </div>
   );

@@ -40,6 +40,7 @@ export interface TestCompleteData {
   status: TestStatus;
   duration: number;
   errorMessage?: string;
+  screenshotBase64?: string;
 }
 
 export interface AnalysisCompleteData {
