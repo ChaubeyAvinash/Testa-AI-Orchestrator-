@@ -30,10 +30,18 @@ NODE_VER=$(node -e "process.stdout.write(process.version)")
 ok "Node.js $NODE_VER"
 
 if ! command -v pnpm >/dev/null 2>&1; then
-  step "pnpm not found — installing..."
-  npm install -g pnpm
+  step "pnpm not found — installing pnpm@latest..."
+  npm install -g pnpm@latest
 fi
+
+# Lockfile uses format v9.0 — requires pnpm v9+
 PNPM_VER=$(pnpm --version)
+PNPM_MAJOR=$(echo "$PNPM_VER" | cut -d. -f1)
+if [ "$PNPM_MAJOR" -lt 9 ]; then
+  step "pnpm $PNPM_VER is too old (need v9+) — upgrading..."
+  npm install -g pnpm@latest
+  PNPM_VER=$(pnpm --version)
+fi
 ok "pnpm $PNPM_VER"
 
 # ── 2. Check .env ──────────────────────────────────────────────────────────────

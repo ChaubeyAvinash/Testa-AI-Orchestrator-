@@ -19,10 +19,18 @@ echo   OK  Node.js %NODE_VER%
 
 where pnpm >nul 2>&1
 if %ERRORLEVEL% neq 0 (
-    echo [TESTA] pnpm not found -- installing...
-    call npm install -g pnpm
+    echo [TESTA] pnpm not found -- installing pnpm@latest...
+    call npm install -g pnpm@latest
 )
+
+:: Lockfile uses format v9.0 -- requires pnpm v9+
 for /f "tokens=*" %%i in ('pnpm --version') do set PNPM_VER=%%i
+for /f "tokens=1 delims=." %%i in ("%PNPM_VER%") do set PNPM_MAJOR=%%i
+if %PNPM_MAJOR% LSS 9 (
+    echo [TESTA] pnpm %PNPM_VER% is too old ^(need v9+^) -- upgrading...
+    call npm install -g pnpm@latest
+    for /f "tokens=*" %%i in ('pnpm --version') do set PNPM_VER=%%i
+)
 echo   OK  pnpm %PNPM_VER%
 
 :: ── 2. Check .env ─────────────────────────────────────────────────────────────
