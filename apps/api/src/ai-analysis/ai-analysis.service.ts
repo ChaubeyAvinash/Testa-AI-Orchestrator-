@@ -3,6 +3,7 @@ import ModelClient, { isUnexpected } from '@azure-rest/ai-inference';
 import { AzureKeyCredential } from '@azure/core-auth';
 import { TestRunResult } from '../test-runner/test-runner.service';
 import { TestStatus } from '@testa/shared';
+import { getMockSuggestion } from '../mock/sample-data';
 
 const SYSTEM_PROMPT = `You are a QA engineer specializing in diagnosing Playwright test failures.
 Given a test name, error message, stack trace, and the test code that failed, provide a concise (3-5 sentences) actionable diagnosis.
@@ -46,8 +47,8 @@ export class AiAnalysisService {
             const suggestion = await this.analyzeSingle(failure, generatedCode);
             suggestions.set(failure.testName, suggestion);
           } catch (err) {
-            this.logger.warn(`Failed to analyze "${failure.testName}": ${err}`);
-            suggestions.set(failure.testName, 'Analysis unavailable for this failure.');
+            this.logger.warn(`Failed to analyze "${failure.testName}": ${err} — using sample suggestion`);
+            suggestions.set(failure.testName, getMockSuggestion(failure.testName));
           }
         }),
       );

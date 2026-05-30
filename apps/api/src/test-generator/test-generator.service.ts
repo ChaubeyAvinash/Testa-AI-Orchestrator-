@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import ModelClient, { isUnexpected } from '@azure-rest/ai-inference';
 import { AzureKeyCredential } from '@azure/core-auth';
 import { CrawlResult } from '../crawler/crawler.service';
+import { getMockGeneratedCode } from '../mock/sample-data';
 
 const SYSTEM_PROMPT = `You are an expert Playwright test engineer. Given information about a web application, you generate comprehensive, robust Playwright tests using TypeScript.
 Your tests use best practices: data-testid selectors preferred, meaningful assertions, proper async/await, and descriptive test names.
@@ -22,27 +23,33 @@ export class TestGeneratorService {
     this.model = process.env.AZURE_AI_MODEL ?? 'gpt-5.1';
   }
 
-  async generate(crawlResult: CrawlResult, testTypes: string[]): Promise<string> {
+  async generate(crawlResult: CrawlResult, testTypes: string[]): Promise<{ code: string; isMock: boolean }> {
     const prompt = this.buildPrompt(crawlResult, testTypes);
     this.logger.log(`Generating tests for ${crawlResult.pages.length} pages, types: ${testTypes.join(', ')}`);
 
-    const response = await this.client.path('/chat/completions').post({
-      body: {
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          { role: 'user', content: prompt },
-        ],
-        model: this.model,
-        max_tokens: 4096,
-      },
-    });
+    try {
+      const response = await this.client.path('/chat/completions').post({
+        body: {
+          messages: [
+            { role: 'system', content: SYSTEM_PROMPT },
+            { role: 'user', content: prompt },
+          ],
+          model: this.model,
+          max_tokens: 4096,
+        },
+      });
 
-    if (isUnexpected(response)) {
-      throw new Error(`Azure AI error: ${JSON.stringify(response.body)}`);
+      if (isUnexpected(response)) {
+        throw new Error(`Azure AI error: ${JSON.stringify(response.body)}`);
+      }
+
+      const text = response.body.choices?.[0]?.message?.content ?? '';
+      const code = text.replace(/^```(?:typescript)?\n?/m, '').replace(/\n?```$/m, '').trim();
+      return { code, isMock: false };
+    } catch (err) {
+      this.logger.warn(`Azure AI unavailable — using sample generated code. Reason: ${err}`);
+      return { code: getMockGeneratedCode(testTypes, crawlResult.baseUrl), isMock: true };
     }
-
-    const text = response.body.choices?.[0]?.message?.content ?? '';
-    return text.replace(/^```(?:typescript)?\n?/m, '').replace(/\n?```$/m, '').trim();
   }
 
   private buildPrompt(crawlResult: CrawlResult, testTypes: string[]): string {
