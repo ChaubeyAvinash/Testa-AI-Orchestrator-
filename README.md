@@ -56,7 +56,7 @@ Live execution progress streams to the browser over **Server-Sent Events** in re
 | 🔍 **AI Failure Analysis** | GPT-5.1 reads error + stack trace + code and gives a 3–5 sentence fix |
 | 📡 **Live SSE Stream** | Every stage transition and test result streams to the UI in real time |
 | 📊 **Report Dashboard** | Pass rate, Recharts pie chart, result table, AI suggestions, screenshot lightbox |
-| 🗄️ **Zero Infrastructure** | SQLite — no Docker, no Postgres, no Redis. One file. |
+| 🗄️ **Zero Infrastructure** | SQLite — no database server, no Docker, no Redis. One local file. |
 | 🎨 **Accenture UI** | Black/purple enterprise design system — sharp, professional, no rounded corners |
 
 ---
