@@ -39,12 +39,13 @@ export class ExecutionsService {
       data: {
         projectId: dto.projectId,
         testTypes: JSON.stringify(dto.testTypes),
+        customPrompt: dto.customPrompt ?? null,
         status: ExecutionStatus.PENDING,
       },
     });
 
     this.sse.create(execution.id);
-    this.runPipeline(execution.id, project.url, dto.testTypes).catch((err) => {
+    this.runPipeline(execution.id, project.url, dto.testTypes, dto.customPrompt).catch((err) => {
       this.logger.error(`Pipeline failed for execution ${execution.id}: ${err}`);
     });
 
@@ -79,7 +80,7 @@ export class ExecutionsService {
     return rows.map(serializeExecution);
   }
 
-  private async runPipeline(executionId: string, url: string, testTypes: string[]) {
+  private async runPipeline(executionId: string, url: string, testTypes: string[], customPrompt?: string) {
     const emit = (event: string, data: unknown) => {
       this.sse.emit(executionId, {
         event: event as any,
@@ -120,7 +121,7 @@ export class ExecutionsService {
       });
       emit('stage_change', { stage: ExecutionStatus.GENERATING, message: 'Generating Playwright tests with AI...' });
 
-      const { code: generatedCode, isMock } = await this.generator.generate(crawlResult, testTypes);
+      const { code: generatedCode, isMock } = await this.generator.generate(crawlResult, testTypes, customPrompt);
       const linesOfCode = generatedCode.split('\n').length;
 
       await this.prisma.execution.update({

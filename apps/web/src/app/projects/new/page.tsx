@@ -17,6 +17,7 @@ export default function NewProjectPage() {
   const [name, setName] = useState('');
   const [url, setUrl] = useState('');
   const [selected, setSelected] = useState<Set<string>>(new Set(['navigation', 'forms']));
+  const [customPrompt, setCustomPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -30,7 +31,11 @@ export default function NewProjectPage() {
     setLoading(true);
     try {
       const project = await api.projects.create({ name, url });
-      const execution = await api.executions.create({ projectId: project.id, testTypes: Array.from(selected) });
+      const execution = await api.executions.create({
+        projectId: project.id,
+        testTypes: Array.from(selected),
+        ...(customPrompt.trim() && { customPrompt: customPrompt.trim() }),
+      });
       router.push(`/executions/${execution.id}`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Request failed — check that the API is running.');
@@ -128,6 +133,23 @@ export default function NewProjectPage() {
               );
             })}
           </div>
+        </div>
+
+        {/* Custom Prompt */}
+        <div>
+          <label className="block text-xs font-bold tracking-widest uppercase text-[#737373] mb-2">
+            Custom Instructions <span className="text-[#444] font-normal normal-case tracking-normal">(optional)</span>
+          </label>
+          <textarea
+            value={customPrompt}
+            onChange={(e) => setCustomPrompt(e.target.value)}
+            placeholder="e.g. Focus on login flows. Test with admin@example.com. Skip pages under /admin."
+            rows={4}
+            className="w-full bg-[#0d0d0d] border border-[#1e1e1e] text-white placeholder-[#444] px-4 py-3 text-sm focus:outline-none focus:border-[#a100ff] transition-colors resize-none"
+          />
+          <p className="text-[#444] text-xs mt-1.5">
+            Extra guidance sent directly to the AI when generating tests. Leave blank to use defaults.
+          </p>
         </div>
 
         {error && (

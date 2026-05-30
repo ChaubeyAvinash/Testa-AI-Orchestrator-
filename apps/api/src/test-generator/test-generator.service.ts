@@ -23,8 +23,8 @@ export class TestGeneratorService {
     this.model = process.env.AZURE_AI_MODEL ?? 'gpt-5.1';
   }
 
-  async generate(crawlResult: CrawlResult, testTypes: string[]): Promise<{ code: string; isMock: boolean }> {
-    const prompt = this.buildPrompt(crawlResult, testTypes);
+  async generate(crawlResult: CrawlResult, testTypes: string[], customPrompt?: string): Promise<{ code: string; isMock: boolean }> {
+    const prompt = this.buildPrompt(crawlResult, testTypes, customPrompt);
     this.logger.log(`Generating tests for ${crawlResult.pages.length} pages, types: ${testTypes.join(', ')}`);
 
     try {
@@ -52,7 +52,7 @@ export class TestGeneratorService {
     }
   }
 
-  private buildPrompt(crawlResult: CrawlResult, testTypes: string[]): string {
+  private buildPrompt(crawlResult: CrawlResult, testTypes: string[], customPrompt?: string): string {
     const pagesSummary = crawlResult.pages
       .map((p) => {
         const formSummary = p.forms.length > 0
@@ -81,6 +81,10 @@ export class TestGeneratorService {
       .map((t) => testInstructions[t])
       .join('\n');
 
+    const customSection = customPrompt?.trim()
+      ? `\nADDITIONAL INSTRUCTIONS FROM USER:\n${customPrompt.trim()}\n`
+      : '';
+
     return `Generate Playwright tests for the following web application.
 
 BASE URL: ${crawlResult.baseUrl}
@@ -90,7 +94,7 @@ ${pagesSummary}
 
 TEST TYPES REQUESTED:
 ${instructions}
-
+${customSection}
 REQUIREMENTS:
 - Import from '@playwright/test'
 - Use page.waitForLoadState('networkidle') after navigation when needed

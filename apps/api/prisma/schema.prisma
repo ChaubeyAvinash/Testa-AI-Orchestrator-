@@ -21,6 +21,7 @@ model Execution {
   project       Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
   status        ExecutionStatus @default(PENDING)
   testTypes     String          @default("[]")
+  customPrompt  String?
   generatedCode String?
   crawlResult   String?
   totalTests    Int             @default(0)

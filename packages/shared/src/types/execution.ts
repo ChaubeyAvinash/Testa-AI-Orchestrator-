@@ -29,4 +29,5 @@ export interface ExecutionDto {
 export interface CreateExecutionDto {
   projectId: string;
   testTypes: string[];
+  customPrompt?: string;
 }

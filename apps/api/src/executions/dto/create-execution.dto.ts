@@ -1,4 +1,4 @@
-import { IsArray, IsString, ArrayMinSize } from 'class-validator';
+import { IsArray, IsString, ArrayMinSize, IsOptional } from 'class-validator';
 
 export class CreateExecutionDto {
   @IsString()
@@ -8,4 +8,8 @@ export class CreateExecutionDto {
   @IsString({ each: true })
   @ArrayMinSize(1)
   testTypes: string[];
+
+  @IsOptional()
+  @IsString()
+  customPrompt?: string;
 }
