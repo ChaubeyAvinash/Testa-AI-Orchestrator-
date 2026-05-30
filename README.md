@@ -15,8 +15,9 @@ TESTA crawls your website, writes Playwright tests using GPT-5.1, executes them,
 <br/>
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com/)
+[![NestJS](https://img.shields.io/badge/NestJS_11-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com/)
 [![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React_19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright&logoColor=white)](https://playwright.dev/)
 [![Azure AI](https://img.shields.io/badge/Azure_AI_Foundry-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)](https://ai.azure.com/)
 [![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://sqlite.org/)
@@ -57,7 +58,7 @@ Live execution progress streams to the browser over **Server-Sent Events** in re
 | 📡 **Live SSE Stream** | Every stage transition and test result streams to the UI in real time |
 | 📊 **Report Dashboard** | Pass rate, Recharts pie chart, result table, AI suggestions, screenshot lightbox |
 | 🗄️ **Zero Infrastructure** | SQLite — no database server, no Docker, no Redis. One local file. |
-| 🎨 **Accenture UI** | Black/purple enterprise design system — sharp, professional, no rounded corners |
+| 🎨 **Enterprise UI** | Black/purple design system — sharp, professional, no rounded corners |
 
 ---
 
@@ -79,14 +80,14 @@ Choose one or more when starting a run:
 
 | Layer | Technology |
 |---|---|
-| **Frontend** | Next.js 16 (App Router) · TypeScript · Tailwind CSS · Recharts |
+| **Frontend** | Next.js 16.2.6 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · Recharts |
 | **Backend** | NestJS 11 · TypeScript · Prisma v7 |
 | **Database** | SQLite via `@prisma/adapter-libsql` — no server required |
 | **AI Model** | Azure AI Foundry · GPT-5.1 via `@azure-rest/ai-inference` |
-| **Browser Engine** | Playwright — used for both crawling and test execution |
+| **Browser Engine** | Playwright 1.60 — used for both crawling and test execution |
 | **Real-time** | Server-Sent Events · NestJS `@Sse()` · RxJS Subjects |
 | **Monorepo** | pnpm workspaces (`apps/api`, `apps/web`, `packages/shared`) |
-| **Launch** | `start.sh` (Linux/macOS/Git Bash) · `start.bat` (Windows) |
+| **Launch** | `start.sh` (Linux/macOS/Git Bash) · `start.bat` (Windows CMD) |
 
 ---
 
@@ -97,6 +98,7 @@ Testa-AI-Orchestrator/
 │
 ├── start.sh                        ← One-command launcher (Linux/macOS/Git Bash)
 ├── start.bat                       ← One-command launcher (Windows CMD)
+├── Makefile                        ← Convenience targets (start, build, migrate, clean)
 ├── .env.example                    ← Environment variable template
 │
 ├── apps/
@@ -183,12 +185,12 @@ bash start.sh
 start.bat
 ```
 
-The script is fully automatic — no manual steps:
+Both scripts are fully automatic — no manual steps:
 
 ```
   ① Check Node.js is installed
   ② Install pnpm if missing
-  ③ Detect missing .env → copy from template + prompt to fill in
+  ③ Detect missing .env → copy from template + prompt to fill in credentials
   ④ pnpm install  (skipped if node_modules already exists)
   ⑤ Build packages/shared (TypeScript types)
   ⑥ prisma migrate deploy  (creates apps/api/dev.db)
@@ -362,8 +364,11 @@ Project
 | `bash start.sh` | Linux / macOS / Git Bash | Full auto-start |
 | `start.bat` | Windows CMD | Full auto-start |
 | `make start` | Any (with make) | Alias for `bash start.sh` |
+| `make install` | Any | Install all workspace dependencies |
 | `make build` | Any | Build all packages |
 | `make migrate` | Any | Apply SQLite migrations |
+| `make generate` | Any | Regenerate Prisma client |
+| `make lint` | Any | Run ESLint across the monorepo |
 | `make clean` | Any | Remove `dist/`, `.next/` |
 
 **Individual dev commands:**
@@ -381,9 +386,35 @@ pnpm --filter @testa/shared build
 # Prisma migration (create new)
 cd apps/api && DATABASE_URL=file:./dev.db npx prisma migrate dev --name <name>
 
+# Regenerate Prisma client (after schema changes)
+cd apps/api && DATABASE_URL=file:./dev.db npx prisma generate
+
 # Open Prisma Studio (DB browser)
 cd apps/api && DATABASE_URL=file:./dev.db npx prisma studio
 ```
+
+---
+
+## Troubleshooting
+
+**`AZURE_AI_API_KEY` / endpoint errors**
+- Ensure `apps/api/.env` exists and has valid credentials from [ai.azure.com](https://ai.azure.com)
+- Verify the deployment name in `AZURE_AI_MODEL` matches exactly what's in your Azure AI Foundry project
+
+**Prisma client errors (`@prisma/client did not initialize yet`)**
+- Run `make generate` (or `cd apps/api && npx prisma generate`) to regenerate the client
+- Ensure `DATABASE_URL=file:./dev.db` is set before running migrations
+
+**Playwright browser not found**
+- Run `npx playwright install chromium` inside `apps/api/` to download the browser binary
+
+**Port already in use (3000 or 3001)**
+- Kill the existing process: `lsof -ti:3001 | xargs kill` (Linux/macOS) or use Task Manager (Windows)
+- Or set a custom port via `PORT=3002` in `apps/api/.env`
+
+**`pnpm: command not found`**
+- The launcher scripts auto-install pnpm via `npm install -g pnpm`
+- If that fails, install manually: `npm install -g pnpm@latest`
 
 ---
 
@@ -396,6 +427,17 @@ cd apps/api && DATABASE_URL=file:./dev.db npx prisma studio
 - [ ] Multi-browser execution (Firefox, WebKit)
 - [ ] Scheduled test runs with email/Slack notifications
 - [ ] Test history comparison and trend charts
+- [ ] Export reports as PDF or HTML
+
+---
+
+## Contributing
+
+1. Fork the repo and create a feature branch
+2. Run `bash start.sh` to confirm the baseline works
+3. Make your changes — the monorepo is hot-reload enabled for both API and frontend
+4. Run `make lint` before opening a PR
+5. Open a pull request against `main`
 
 ---
 
