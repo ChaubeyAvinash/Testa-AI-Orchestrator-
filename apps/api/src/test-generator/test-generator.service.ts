@@ -12,18 +12,23 @@ The output must be a single valid .spec.ts file using @playwright/test.`;
 @Injectable()
 export class TestGeneratorService {
   private readonly logger = new Logger(TestGeneratorService.name);
-  private readonly client: ReturnType<typeof ModelClient>;
+  private readonly client: ReturnType<typeof ModelClient> | null;
   private readonly model: string;
 
   constructor() {
-    this.client = ModelClient(
-      process.env.AZURE_INFERENCE_ENDPOINT!,
-      new AzureKeyCredential(process.env.AZURE_AI_API_KEY!),
-    );
+    const key = process.env.AZURE_AI_API_KEY;
+    this.client = key
+      ? ModelClient(process.env.AZURE_INFERENCE_ENDPOINT!, new AzureKeyCredential(key))
+      : null;
     this.model = process.env.AZURE_AI_MODEL ?? 'gpt-5.1';
   }
 
   async generate(crawlResult: CrawlResult, testTypes: string[], customPrompt?: string): Promise<{ code: string; isMock: boolean }> {
+    if (!this.client) {
+      this.logger.warn('No AZURE_AI_API_KEY — using sample generated code.');
+      return { code: getMockGeneratedCode(testTypes, crawlResult.baseUrl), isMock: true };
+    }
+
     const prompt = this.buildPrompt(crawlResult, testTypes, customPrompt);
     this.logger.log(`Generating tests for ${crawlResult.pages.length} pages, types: ${testTypes.join(', ')}`);
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useState, useCallback } from 'react';
+import { use, useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSSEStream } from '@/hooks/useSSEStream';
 import type { SSEEvent, StageChangeData, TestCompleteData, CrawlProgressData } from '@testa/shared';
@@ -39,6 +39,21 @@ export default function ExecutionPage({ params }: { params: Promise<{ id: string
   const [done, setDone] = useState(false);
   const [failedResults, setFailedResults] = useState<FailedResult[]>([]);
   const [expandedScreenshot, setExpandedScreenshot] = useState<string | null>(null);
+
+  // If the pipeline already completed before the SSE stream connected, redirect immediately
+  useEffect(() => {
+    const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    fetch(`${base}/api/v1/executions/${id}`)
+      .then((r) => r.json())
+      .then((exec) => {
+        if (exec?.status === ExecutionStatus.COMPLETED) {
+          router.replace(`/executions/${id}/report`);
+        } else if (exec?.status === ExecutionStatus.FAILED) {
+          setDone(true);
+        }
+      })
+      .catch(() => {});
+  }, [id, router]);
 
   const addLog = (message: string, level: LogEntry['level'] = 'log') =>
     setLog((prev) => [...prev, { time: new Date().toLocaleTimeString('en', { hour12: false }), message, level }]);

@@ -34,6 +34,16 @@ export function useSSEStream(
 
     es.onerror = () => {
       es.close();
+      // Poll once to check if execution already completed while we were connecting
+      const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      fetch(`${base}/api/v1/executions/${executionId}`)
+        .then((r) => r.json())
+        .then((exec) => {
+          if (exec?.status === 'COMPLETED') {
+            onEventRef.current({ event: 'execution_complete', executionId: executionId!, timestamp: new Date().toISOString(), data: {} } as any);
+          }
+        })
+        .catch(() => {});
       onCompleteRef.current?.();
     };
 

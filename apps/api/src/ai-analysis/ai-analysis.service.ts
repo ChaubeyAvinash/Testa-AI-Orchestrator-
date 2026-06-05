@@ -13,14 +13,14 @@ Output plain text only — no markdown, no bullet points, no headers.`;
 @Injectable()
 export class AiAnalysisService {
   private readonly logger = new Logger(AiAnalysisService.name);
-  private readonly client: ReturnType<typeof ModelClient>;
+  private readonly client: ReturnType<typeof ModelClient> | null;
   private readonly model: string;
 
   constructor() {
-    this.client = ModelClient(
-      process.env.AZURE_INFERENCE_ENDPOINT!,
-      new AzureKeyCredential(process.env.AZURE_AI_API_KEY!),
-    );
+    const key = process.env.AZURE_AI_API_KEY;
+    this.client = key
+      ? ModelClient(process.env.AZURE_INFERENCE_ENDPOINT!, new AzureKeyCredential(key))
+      : null;
     this.model = process.env.AZURE_AI_MODEL ?? 'gpt-5.1';
   }
 
@@ -32,6 +32,10 @@ export class AiAnalysisService {
     const suggestions = new Map<string, string>();
 
     if (failures.length === 0) return suggestions;
+    if (!this.client) {
+      failures.forEach((f) => suggestions.set(f.testName, getMockSuggestion(f.testName)));
+      return suggestions;
+    }
     this.logger.log(`Analyzing ${failures.length} test failures`);
 
     const CONCURRENCY = 3;
@@ -68,7 +72,7 @@ ${stackLines || 'No stack trace'}
 TEST CODE:
 ${testBlock || 'Code not available'}`;
 
-    const response = await this.client.path('/chat/completions').post({
+    const response = await this.client!.path('/chat/completions').post({
       body: {
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
